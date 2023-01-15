@@ -5,7 +5,7 @@ on:
 
 env:
   SERVER_HOST: 31.42.189.136
-  SERVER_USER: Valeron
+  SERVER_USER: root
   SERVER_PATH: /home/Valeron/sites/test1.websitetest.ru
 
 jobs:
