@@ -1,19 +1,30 @@
 name: Deploy
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
+
+env:
+  SERVER_HOST: 31.42.189.136
+  SERVER_USER: Valeron
+  SERVER_PATH: /home/Valeron/sites/test1.websitetest.ru
 
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "$" > "$HOME/.ssh/MY_KEY"
-      - run: chmod 600 "$HOME/.ssh/MY_KEY"
+      - uses: actions/checkout@v3
+
+      # Install ssh key
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2.3.1
+        with:
+          key: "${{ secrets.MY_KEY }}"
+          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
+          
+      - name: Generate auth hosts
+        run: ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
       # Deploy
-      - run: rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . /home/Valeron/sites/test1.websitetest.ru
+      - run: rsync --archive --compress --progress . ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PATH }}
